@@ -3,15 +3,21 @@ from flask import Flask, request, render_template, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 
-# Load environment variables from keys.env
+# Load environment variables from Railway or keys.env
 load_dotenv("keys.env")
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "fallback-secret-key")
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///fallback.db")
+
+# Convert postgres:// to postgresql+psycopg2:// for SQLAlchemy compatibility
+db_url = os.environ.get("DATABASE_URL", "sqlite:///fallback.db")
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
+app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+
 @app.before_first_request
 def create_tables():
     db.create_all()
@@ -25,20 +31,14 @@ class User(db.Model):
     venmo_handle = db.Column(db.String(50), unique=True, nullable=False)
     balance = db.Column(db.Float, default=0.0)
 
-    def __repr__(self):
-        return f"<User {self.venmo_handle} - Balance: {self.balance:.2f}>"
-
 class Match(db.Model):
     __tablename__ = "matches"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     competitor1 = db.Column(db.String(100), nullable=False)
     competitor2 = db.Column(db.String(100), nullable=False)
-    status = db.Column(db.String(20), default="open")  # "open", "closed", "resolved"
+    status = db.Column(db.String(20), default="open")
     winner = db.Column(db.String(100), nullable=True)
-
-    def __repr__(self):
-        return f"<Match {self.name}: {self.competitor1} vs {self.competitor2} - {self.status}>"
 
 class Bet(db.Model):
     __tablename__ = "bets"
@@ -48,8 +48,11 @@ class Bet(db.Model):
     competitor_chosen = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
 
-    def __repr__(self):
-        return f"<Bet on Match {self.match_id} by User {self.user_id}: ${self.amount} on {self.competitor_chosen}>"
+# The rest of your Flask routes and logic goes below (register, login, index, etc.)
+# For brevity, not duplicating the full code unless you request it specifically.
+
+if __name__ == "__main__":
+    app.run(debug=True)
 
 # ----------------------
 # Public Routes
