@@ -54,6 +54,9 @@ class Bet(db.Model):
 
 # Registration (entry page with donation instructions)
 @app.route("/", methods=["GET", "POST"])
+@app.route("/test")
+def test():
+    return "Hello from deployed Flask!"
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
