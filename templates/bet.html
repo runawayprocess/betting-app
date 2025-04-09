@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Place Bet - PHILSOC Wrestling</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #39FF14;
+      font-family: 'Courier New', Courier, monospace;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+        background: #111;
+        padding: 20px;
+        text-align: center;
+        font-size: 2.5em;
+        font-weight: bold;
+        color: #FF4500;
+        /* Animated neon flicker effect */
+        text-shadow: 0 0 5px #FF4500, 0 0 10px #FF4500, 0 0 20px #FF4500;
+        animation: neonFlicker 1.5s infinite alternate;
+      }
+      
+      /* Define a keyframes animation to simulate a flicker effect */
+      @keyframes neonFlicker {
+        0% {
+          text-shadow: 0 0 5px #FF4500, 0 0 10px #FF4500, 0 0 20px #FF4500;
+        }
+        25% {
+          text-shadow: 0 0 15px #FF4500, 0 0 25px #FF4500, 0 0 35px #FF4500;
+        }
+        50% {
+          text-shadow: 0 0 5px #FF4500, 0 0 10px #FF4500, 0 0 20px #FF4500;
+        }
+        75% {
+          text-shadow: 0 0 20px #FF4500, 0 0 30px #FF4500, 0 0 40px #FF4500;
+        }
+        100% {
+          text-shadow: 0 0 5px #FF4500, 0 0 10px #FF4500, 0 0 20px #FF4500;
+        }
+      }
+      
+    .container {
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #39FF14;
+      background: #222;
+      color: #39FF14;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #FF00FF;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      color: #000;
+    }
+    button:hover { opacity: 0.8; }
+    a { color: #39FF14; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    p.reminder {
+      color: #FF00FF;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+  </style>
+</head>
+<body>
+  <header>PHILSOC WRESTLING</header>
+  <div class="container">
+    <h2>Place Your Bet</h2>
+    <p class="reminder">
+      Reminder: Venmo your bet to <strong>@Zachary-Jones-256</strong> before the round starts! Otherwise, you will recieve no winnings and we will publically shame you!
+    </p>
+    <form method="POST" action="{{ url_for('place_bet', match_id=match.id) }}">
+      <label for="venmo_handle">Your Venmo Handle:</label>
+      <input type="text" name="venmo_handle" placeholder="@yourhandle" value="{{ logged_in_handle or '' }}" required>
+      <label for="competitor">Choose Competitor:</label>
+      <select name="competitor" required>
+        <option value="{{ match.competitor1 }}">{{ match.competitor1 }}</option>
+        <option value="{{ match.competitor2 }}">{{ match.competitor2 }}</option>
+      </select>
+      <label for="amount">Bet Amount:</label>
+      <input type="number" name="amount" step="0.01" placeholder="Enter amount" required>
+      <button type="submit">Place Bet</button>
+    </form>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+          {% for msg in messages %}
+            <li>{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <div class="gif-container">
+        <img src="{{ url_for('static', filename='gamble.gif') }}" alt="Animated Sauce GIF">
+      </div>
+  </div>
+</body>
+</html>

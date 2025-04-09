@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PHILSOC Wrestling - Matches</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #39FF14;
+      font-family: 'Courier New', Courier, monospace;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: url('/static/fire.gif') no-repeat center;
+      background-size: cover;
+      padding: 40px; /* Increase padding to show the background image clearly */
+      text-align: center;
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #FF4500;
+      text-shadow: 0 0 10px #FF4500;
+    }
+    nav {
+      text-align: center;
+      margin: 10px 0;
+    }
+    nav a {
+      color: #39FF14;
+      text-decoration: none;
+      font-size: 1.2em;
+      margin: 0 10px;
+    }
+    nav a:hover { 
+      text-decoration: underline; 
+    }
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+    h2 { 
+      color: #FF00FF; 
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 15px;
+      padding: 10px;
+      border-bottom: 1px solid #39FF14;
+    }
+    .odds {
+      font-size: 0.9em;
+      color: #FF00FF;
+    }
+    .probabilities {
+      font-size: 0.9em;
+      color: #FFFF00;
+    }
+    .bet-now {
+      color: yellow;
+      font-weight: bold;
+      text-decoration: none;
+      background-color: rgba(255, 255, 0, 0.2); /* Light yellow background */
+      padding: 5px 10px;
+      border-radius: 5px;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+    .bet-now:hover {
+      background-color: rgba(255, 255, 0, 0.4);
+      transform: scale(1.05);
+    }
+    @media (max-width: 600px) {
+      header { font-size: 2em; }
+      nav a { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+  <header>PHILSOC WRESTLING</header>
+  <nav>
+    {% if logged_in_handle %}
+      Logged in as: {{ logged_in_handle }} (<a href="{{ url_for('logout') }}">Logout</a>)
+      {% if user_balance is not none %}
+        - Winnings: ${{ "%.2f"|format(user_balance) }}
+      {% endif %}
+    {% else %}
+      <a href="{{ url_for('register') }}">Register</a>
+      <a href="{{ url_for('login') }}">Login</a>
+    {% endif %}
+  </nav>
+  <div class="container">
+    <h2>All Matches</h2>
+    {% if matches %}
+      <ul>
+        {% for m in matches %}
+          <li>
+            <strong>{{ m.name }}</strong>: {{ m.competitor1 }} vs {{ m.competitor2 }} (Status: {{ m.status }})
+            {% if odds[m.id].odds1 is not none and odds[m.id].odds2 is not none %}
+              <div class="odds">
+                Odds - {{ m.competitor1 }}: {{ "%.2f"|format(odds[m.id].odds1) }}, 
+                {{ m.competitor2 }}: {{ "%.2f"|format(odds[m.id].odds2) }}
+              </div>
+              <div class="probabilities">
+                Expected Win % - {{ m.competitor1 }}: 
+                {% if odds[m.id].prob1 is not none %}{{ "%.1f"|format(odds[m.id].prob1) }}%{% else %}N/A{% endif %}, 
+                {{ m.competitor2 }}: 
+                {% if odds[m.id].prob2 is not none %}{{ "%.1f"|format(odds[m.id].prob2) }}%{% else %}N/A{% endif %}
+              </div>
+            {% else %}
+              <div class="odds">
+                No bets yet – odds not available.
+              </div>
+            {% endif %}
+            {% if m.status == 'open' %}
+              <br><a class="bet-now" href="{{ url_for('place_bet', match_id=m.id) }}">Bet Now!</a>
+            {% elif m.status == 'closed' %}
+              <br><em>(Betting closed)</em>
+            {% elif m.status == 'resolved' %}
+              <br><em>(Winner: {{ m.winner }})</em>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No matches found.</p>
+    {% endif %}
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+          {% for msg in messages %}
+            <li>{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+  </div>
+</body>
+</html>

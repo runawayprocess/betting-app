@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Balances</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { border-collapse: collapse; width: 60%; margin-top: 20px; }
+        th, td { border: 1px solid #aaa; padding: 8px 12px; text-align: left; }
+        th { background-color: #eee; }
+    </style>
+</head>
+<body>
+    <h1>User Balances</h1>
+    {% if users %}
+        <table>
+            <tr>
+                <th>Venmo Handle</th>
+                <th>Balance</th>
+            </tr>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.venmo_handle }}</td>
+                    <td>${{ "%.2f"|format(user.balance) }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No user balances available.</p>
+    {% endif %}
+    <p><a href="{{ url_for('index') }}">Return Home</a></p>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Remove Invalid Bets - Admin Dashboard</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #39FF14;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      color: #FF00FF;
+    }
+    textarea {
+      width: 100%;
+      max-width: 600px;
+      height: 150px;
+      background-color: #222;
+      color: #39FF14;
+      border: 1px solid #39FF14;
+      padding: 10px;
+      font-family: monospace;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #FF00FF;
+      border: none;
+      font-weight: bold;
+      color: #000;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+    a {
+      color: #39FF14;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>Remove Invalid Bets</h1>
+  <p>
+    Enter the Venmo handles for users whose bets should be removed (for example, if they missed the $5 donation). 
+    You can separate handles by commas or newlines.
+  </p>
+  <form method="POST" action="{{ url_for('remove_invalid_bets') }}">
+    <textarea name="handles" placeholder="@handle1, @handle2, @handle3"></textarea>
+    <br>
+    <button type="submit">Remove Bets</button>
+  </form>
+  <p><a href="{{ url_for('admin_dashboard') }}">Return to Admin Dashboard</a></p>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="flash">
+        <ul>
+          {% for msg in messages %}
+            <li>{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  {% endwith %}
+</body>
+</html>
