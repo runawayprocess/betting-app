@@ -349,7 +349,6 @@ def admin_dashboard():
     for u in users:
         total_bets = sum(bet.amount for bet in Bet.query.filter_by(user_id=u.id).all())
         user_gross[u.id] = u.balance + total_bets
-    print(matches, users, user_gross)
     return render_template("admin_dashboard.html",
                            matches=matches,
                            bet_volume_data=bet_volume_data,
