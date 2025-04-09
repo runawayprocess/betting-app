@@ -58,10 +58,6 @@ if __name__ == "__main__":
 
 # Registration (entry page with donation instructions)
 @app.route("/", methods=["GET", "POST"])
-@app.route("/init_db")
-def init_db():
-    db.create_all()
-    return "Database initialized!"
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
