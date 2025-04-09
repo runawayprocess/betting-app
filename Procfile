@@ -1,1 +1,1 @@
-betting-app-production-8636.up.railway.app
+web: gunicorn app:app --bind 0.0.0.0:$PORT
