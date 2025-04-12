@@ -2,6 +2,8 @@ import os
 from flask import Flask, request, render_template, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
+from werkzeug.utils import secure_filename
+import io
 
 # Load environment variables from Railway or keys.env
 load_dotenv("keys.env")
@@ -388,6 +390,42 @@ def remove_invalid_bets():
         return redirect(url_for("admin_dashboard"))
     
     return render_template("remove_invalid_bets.html")
+@app.route("/adminRoheis14isdead/upload_venmo", methods=["GET", "POST"])
+def upload_venmo():
+    if request.method == "POST":
+        file = request.files.get("file")
+        if not file:
+            flash("No file uploaded.")
+            return redirect(url_for("upload_venmo"))
+
+        filename = secure_filename(file.filename)
+        try:
+            df = pd.read_csv(file)
+
+            # Filter only Payments where you received money (exclude yourself)
+            df = df[(df["Type"] == "Payment") & (df["To"].str.lower().str.strip() == "zachary jones") & (df["From"].str.lower().str.strip() != "philsoc")]
+
+            df["username"] = df["From"].str.lower().str.strip()
+            df["amount"] = df["Amount (total)"].replace('[\$,()]', '', regex=True).astype(float)
+
+            # Group by sender and total their donations
+            donations = df.groupby("username")["amount"].sum().reset_index()
+
+            updated_users = 0
+            for _, row in donations.iterrows():
+                user = User.query.filter(User.venmo_handle.ilike(row["username"])).first()
+                if user:
+                    user.balance += row["amount"]
+                    updated_users += 1
+
+            db.session.commit()
+            flash(f"Successfully processed Venmo statement. Updated {updated_users} user(s).")
+        except Exception as e:
+            flash(f"Error processing file: {str(e)}")
+
+        return redirect(url_for("upload_venmo"))
+
+    return render_template("upload_venmo.html")
 @app.route("/prizes")
 def prizes():
     return render_template("prizes.html")
