@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 import io
+import pandas as pd
 
 # Load environment variables from Railway or keys.env
 load_dotenv("keys.env")
