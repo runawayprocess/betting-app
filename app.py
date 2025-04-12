@@ -46,6 +46,10 @@ class Bet(db.Model):
     competitor_chosen = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
 
+with app.app_context():
+    db.drop_all()
+    db.create_all()
+
 # The rest of your Flask routes and logic goes below (register, login, index, etc.)
 # For brevity, not duplicating the full code unless you request it specifically.
 
