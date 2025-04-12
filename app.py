@@ -406,7 +406,7 @@ def upload_venmo():
             df = df[(df["Type"] == "Payment") & (df["To"].str.lower().str.strip() == "zachary jones") & (df["From"].str.lower().str.strip() != "philsoc")]
 
             df["username"] = df["From"].str.lower().str.strip()
-            df["amount"] = df["Amount (total)"].replace('[\$,()]', '', regex=True).astype(float)
+            df["amount"] = df["Amount (total)"].replace(r'[\$,()]', '', regex=True).astype(float)
 
             # Group by sender and total their donations
             donations = df.groupby("username")["amount"].sum().reset_index()
