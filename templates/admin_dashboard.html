@@ -76,6 +76,7 @@
         <a href="{{ url_for('export_csv') }}">Export Final Balance (CSV)</a> | 
         <a href="{{ url_for('export_bets') }}">Export All Bets (CSV)</a>
         <p><a href="{{ url_for('remove_invalid_bets') }}">Remove Invalid Bets</a></p>
+        <p><a href="{{ url_for('upload_venmo') }}">Upload Venmo Statement</a></p>
     </p>
 
     <!-- Flash messages -->
@@ -221,8 +222,6 @@
             </table>
         {% else %}
             <p>No user balance available.</p>
-        {% endif %}
-        <p><a href="{{ url_for('upload_venmo') }}">Upload Venmo Statement</a></p>
-    </div>
+        {% endif %}    </div>
 </body>
 </html>
