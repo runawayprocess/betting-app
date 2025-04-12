@@ -48,11 +48,7 @@ class Bet(db.Model):
     match_id = db.Column(db.Integer, db.ForeignKey("matches.id"), nullable=False)
     competitor_chosen = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
-
-with app.app_context():
-    db.drop_all()
-    db.create_all()
-
+    
 # The rest of your Flask routes and logic goes below (register, login, index, etc.)
 # For brevity, not duplicating the full code unless you request it specifically.
 
@@ -172,6 +168,11 @@ def place_bet(match_id):
             if amount <= 0:
                 flash("Bet amount must be greater than zero.")
                 return redirect(url_for("place_bet", match_id=match.id))
+
+            if amount > user.balance:
+                flash(f"Insufficient points. You only have ${user.balance:.2f}.")
+                return redirect(url_for("place_bet", match_id=match.id))
+
         except ValueError:
             flash("Invalid bet amount.")
             return redirect(url_for("place_bet", match_id=match.id))
@@ -179,6 +180,7 @@ def place_bet(match_id):
         new_bet = Bet(user_id=user.id, match_id=match.id,
                       competitor_chosen=chosen_competitor, amount=amount)
         db.session.add(new_bet)
+        user.balance -= amount
         db.session.commit()
         flash(f"You bet ${amount} on {chosen_competitor} for match '{match.name}'.")
         return redirect(url_for("index"))
