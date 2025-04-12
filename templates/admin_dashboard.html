@@ -73,7 +73,7 @@
     <h1>Super Secret Control Center</h1>
     <p>
         <a href="{{ url_for('index') }}">Return to Main Site</a> | 
-        <a href="{{ url_for('export_csv') }}">Export Final Balances (CSV)</a> | 
+        <a href="{{ url_for('export_csv') }}">Export Final Points (CSV)</a> | 
         <a href="{{ url_for('export_bets') }}">Export All Bets (CSV)</a>
         <p><a href="{{ url_for('remove_invalid_bets') }}">Remove Invalid Bets</a></p>
     </p>
@@ -199,20 +199,20 @@
         {% endif %}
     </div>
 
-    <!-- User Balances Section -->
-    <div class="section" id="user-balances">
-        <h2>User Balances</h2>
+    <!-- User Points Section -->
+    <div class="section" id="user-points">
+        <h2>User Points</h2>
         {% if users %}
             <table>
                 <tr>
                     <th>Venmo Handle</th>
-                    <th>Winnings</th>
-                    <th>Gross Balance</th>
+                    <th>Points</th>
+                    <th>Gross Points</th>
                 </tr>
                 {% for user in users %}
                 <tr>
                     <td>{{ user.venmo_handle }}</td>
-                    <td>${{ "%.2f"|format(user.balance) }}</td>
+                    <td>${{ "%.2f"|format(user.points) }}</td>
                     <td>
                         ${{ "%.2f"|format(user_gross.get(user.id, 0.00)) }}
                     </td>
@@ -220,7 +220,7 @@
                 {% endfor %}
             </table>
         {% else %}
-            <p>No user balances available.</p>
+            <p>No user points available.</p>
         {% endif %}
     </div>
 </body>

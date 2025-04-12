@@ -27,7 +27,7 @@ class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     venmo_handle = db.Column(db.String(50), unique=True, nullable=False)
-    balance = db.Column(db.Float, default=0.0)
+    points = db.Column(db.Float, default=0.0)
 
 class Match(db.Model):
     __tablename__ = "matches"
@@ -71,7 +71,7 @@ def register():
             flash("This Venmo handle is already registered. Please use it to log in.")
             return redirect(url_for("login"))
         
-        new_user = User(venmo_handle=venmo_handle, balance=0.0)
+        new_user = User(venmo_handle=venmo_handle, points=0.0)
         db.session.add(new_user)
         db.session.commit()
         flash("Registration successful! You can now start placing bets.")
@@ -109,11 +109,11 @@ def logout():
 def index():
     all_matches = Match.query.all()
     logged_in_handle = session.get("venmo_handle")
-    user_balance = None
+    user_points = None
     if logged_in_handle:
         user_obj = User.query.filter_by(venmo_handle=logged_in_handle).first()
         if user_obj:
-            user_balance = user_obj.balance
+            user_points = user_obj.points
 
     # Compute odds and expected win probabilities.
     odds_dict = {}
@@ -134,7 +134,7 @@ def index():
     return render_template("index.html", 
                            matches=all_matches, 
                            logged_in_handle=logged_in_handle,
-                           user_balance=user_balance,
+                           user_points=user_points,
                            odds=odds_dict)
 
 # Betting Route: Allows a user to place a bet.
@@ -178,28 +178,28 @@ def place_bet(match_id):
     
     return render_template("bet.html", match=match, logged_in_handle=logged_in_handle)
 
-# Public Balance Page: Displays all users' balances.
-@app.route("/balance")
-def view_balance():
+# Public Points Page: Displays all users' points..
+@app.route("/points")
+def view_points():
     all_users = User.query.order_by(User.venmo_handle).all()
-    return render_template("balance.html", users=all_users)
+    return render_template("points.html", users=all_users)
 
-# CSV Export for Final Balances (Admin Only)
+# CSV Export for Final Points (Admin Only)
 @app.route("/admin/export_csv", methods=["GET"])
 def export_csv():
     import csv
     from io import StringIO
     output = StringIO()
     writer = csv.writer(output)
-    writer.writerow(["Venmo Handle", "Gross Balance"])
+    writer.writerow(["Venmo Handle", "Gross Points"])
     users = User.query.order_by(User.venmo_handle).all()
     for user in users:
         total_bets = sum(bet.amount for bet in Bet.query.filter_by(user_id=user.id).all())
-        gross_balance = user.balance + total_bets
-        writer.writerow([user.venmo_handle, f"{gross_balance:.2f}"])
+        gross_points = user.points + total_bets
+        writer.writerow([user.venmo_handle, f"{gross_points:.2f}"])
     output.seek(0)
     return (output.getvalue(), 200,
-            {"Content-Type": "text/csv", "Content-Disposition": 'attachment; filename="final_balances.csv"'})
+            {"Content-Type": "text/csv", "Content-Disposition": 'attachment; filename="final_points.csv"'})
 
 # ----------------------
 # Combined Admin Dashboard (Obscured URL)
@@ -207,7 +207,7 @@ def export_csv():
 #   - Create Match form,
 #   - For each match: close or resolve actions,
 #   - Bet Volume data,
-#   - User Balances.
+#   - User Points
 # ----------------------
 @app.route("/admin/export_bets", methods=["GET"])
 def export_bets():
@@ -283,7 +283,7 @@ def admin_dashboard():
                         for bet in winning_bets:
                             share = (bet.amount / total_winning) * total_losing
                             user = User.query.get(bet.user_id)
-                            user.balance += share
+                            user.points += share
                     match.status = "resolved"
                     match.winner = winner
                     db.session.commit()
@@ -298,7 +298,7 @@ def admin_dashboard():
                 bets = Bet.query.filter_by(match_id=match.id).all()
                 for bet in bets:
                     user = User.query.get(bet.user_id)
-                    user.balance += bet.amount  # refund the bet amount
+                    user.points += bet.amount  # refund the bet amount
                 match.status = "resolved"
                 match.winner = "Draw"
                 db.session.commit()
@@ -316,7 +316,7 @@ def admin_dashboard():
                     # For a draw, each bet was refunded by adding bet.amount.
                     for bet in bets:
                         user = User.query.get(bet.user_id)
-                        user.balance -= bet.amount
+                        user.points -= bet.amount
                 else:
                     # For normal resolutions, we reverse the winnings credited.
                     winning_bets = [bet for bet in bets if bet.competitor_chosen == match.winner]
@@ -327,7 +327,7 @@ def admin_dashboard():
                         for bet in winning_bets:
                             share = (bet.amount / total_winning) * total_losing
                             user = User.query.get(bet.user_id)
-                            user.balance -= share
+                            user.points -= share
                 # Now reopen the match by setting status to "closed" and clearing the winner.
                 match.status = "closed"
                 match.winner = None
@@ -352,7 +352,7 @@ def admin_dashboard():
     user_gross = {}
     for u in users:
         total_bets = sum(bet.amount for bet in Bet.query.filter_by(user_id=u.id).all())
-        user_gross[u.id] = u.balance + total_bets
+        user_gross[u.id] = u.points + total_bets
     return render_template("admin_dashboard.html",
                            matches=matches,
                            bet_volume_data=bet_volume_data,

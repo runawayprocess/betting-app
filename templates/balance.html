@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>User Balances</title>
+    <title>User Points</title>
     <style>
         body { font-family: Arial, sans-serif; }
         table { border-collapse: collapse; width: 60%; margin-top: 20px; }
@@ -10,22 +10,22 @@
     </style>
 </head>
 <body>
-    <h1>User Balances</h1>
+    <h1>User Points</h1>
     {% if users %}
         <table>
             <tr>
                 <th>Venmo Handle</th>
-                <th>Balance</th>
+                <th>Points</th>
             </tr>
             {% for user in users %}
                 <tr>
                     <td>{{ user.venmo_handle }}</td>
-                    <td>${{ "%.2f"|format(user.balance) }}</td>
+                    <td>${{ "%.2f"|format(user.points) }}</td>
                 </tr>
             {% endfor %}
         </table>
     {% else %}
-        <p>No user balances available.</p>
+        <p>No user points available.</p>
     {% endif %}
     <p><a href="{{ url_for('index') }}">Return Home</a></p>
 </body>

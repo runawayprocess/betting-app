@@ -84,8 +84,8 @@
   <nav>
     {% if logged_in_handle %}
       Logged in as: {{ logged_in_handle }} (<a href="{{ url_for('logout') }}">Logout</a>)
-      {% if user_balance is not none %}
-        - Winnings: ${{ "%.2f"|format(user_balance) }}
+      {% if user_points is not none %}
+        - Points: ${{ "%.2f"|format(user_points) }}
       {% endif %}
     {% else %}
       <a href="{{ url_for('register') }}">Register</a>
