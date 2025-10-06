@@ -23,9 +23,7 @@ db = SQLAlchemy(app)
 with app.app_context():
     db.create_all()
 
-# ----------------------
 # Database Models
-# ----------------------
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -49,15 +47,10 @@ class Bet(db.Model):
     competitor_chosen = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     
-# The rest of your Flask routes and logic goes below (register, login, index, etc.)
-# For brevity, not duplicating the full code unless you request it specifically.
-
 if __name__ == "__main__":
     app.run(debug=True)
 
-# ----------------------
 # Public Routes
-# ----------------------
 
 # Registration (entry page with donation instructions)
 @app.route("/", methods=["GET", "POST"])
@@ -210,14 +203,6 @@ def export_csv():
     return (output.getvalue(), 200,
             {"Content-Type": "text/csv", "Content-Disposition": 'attachment; filename="final_balance.csv"'})
 
-# ----------------------
-# Combined Admin Dashboard (Obscured URL)
-# This page provides:
-#   - Create Match form,
-#   - For each match: close or resolve actions,
-#   - Bet Volume data,
-#   - User balance
-# ----------------------
 @app.route("/admin/export_bets", methods=["GET"])
 def export_bets():
         import csv
@@ -433,9 +418,7 @@ def upload_venmo():
 def prizes():
     return render_template("prizes.html")
 
-# ----------------------
 # Database Initialization and App Launch
-# ----------------------
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
